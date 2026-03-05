@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>One Sample T-Test Tool</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+    margin:0;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+    padding:40px;
+}
+
+.card{
+    background:#1e293b;
+    padding:25px;
+    border-radius:10px;
+}
+
+input, select, textarea{
+    width:100%;
+    padding:10px;
+    margin-top:8px;
+    margin-bottom:18px;
+    border:none;
+    border-radius:5px;
+}
+
+button{
+    padding:12px 20px;
+    border:none;
+    background:#3b82f6;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#2563eb;
+}
+
+.result{
+    margin-top:20px;
+    background:#020617;
+    padding:15px;
+    border-radius:6px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<h2>📊 One Sample T-Test</h2>
+
+<label>Sample Data (comma separated)</label>
+<textarea id="data" placeholder="Example: 102,98,101,105,97,99,103"></textarea>
+
+<label>Population Mean (H0)</label>
+<input type="number" id="mean" placeholder="Example: 108">
+
+<label>Hypothesis</label>
+<select id="hypothesis">
+<option value="two-sided">Two Sided</option>
+<option value="greater">Greater Than</option>
+<option value="less">Less Than</option>
+</select>
+
+<button onclick="runTest()">Run T-Test</button>
+
+<div class="result" id="output"></div>
+
+</div>
+
+</div>
+
+<script>
+
+async function runTest(){
+
+const dataText = document.getElementById("data").value
+const popMean = document.getElementById("mean").value
+const hypothesis = document.getElementById("hypothesis").value
+
+if(!dataText){
+    alert("Enter sample data")
+    return
+}
+
+let numbers = dataText.split(",").map(Number)
+
+const response = await fetch("/ttest",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+data:numbers,
+mean:popMean,
+hypothesis:hypothesis
+})
+
+})
+
+const result = await response.json()
+
+document.getElementById("output").innerHTML =
+
+`<b>T Statistic:</b> ${result.t_statistic.toFixed(4)} <br>
+<b>P Value:</b> ${result.p_value.toFixed(6)}`
+
+}
+
+</script>
+
+</body>
+</html>
