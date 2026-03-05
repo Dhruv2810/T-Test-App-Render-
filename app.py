@@ -1,18 +1,26 @@
+from flask import Flask, request, jsonify, render_template
 import numpy as np
 from scipy import stats
 
+app = Flask(app.py)
+
 def one_sample_t_test(data, pop_mean, hypothesis):
-    # Perform 1-sample t-test
-    # hypothesis arg maps to 'alternative': 'two-sided', 'less', 'greater'
     t_stat, p_val = stats.ttest_1samp(data, pop_mean, alternative=hypothesis)
-   
-    return {'t_statistic': t_stat, 'p_value': p_val}
+    return {'t_statistic': float(t_stat), 'p_value': float(p_val)}
 
-# Test Data
-data = [102, 98, 101, 105, 97, 99, 103]
-pop_mean_h0 = 108
+@app.route("/")
+def home():
+    return "T-Test API Running"
 
-# H0: mu <= 108 means Ha: mu > 108 -> 'greater'
-result = one_sample_t_test(data, pop_mean_h0, 'greater')
+@app.route("/ttest", methods=["POST"])
+def ttest():
+    data = request.json["data"]
+    mean = float(request.json["mean"])
+    hypothesis = request.json["hypothesis"]
 
-print(result)
+    result = one_sample_t_test(data, mean, hypothesis)
+
+    return jsonify(result)
+
+if __name__ == "__main__":
+    app.run()
