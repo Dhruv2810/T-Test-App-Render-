@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import numpy as np
 from scipy import stats
 
-app = Flask(app.py)
+app = Flask(__name__)
 
 def one_sample_t_test(data, pop_mean, hypothesis):
     t_stat, p_val = stats.ttest_1samp(data, pop_mean, alternative=hypothesis)
