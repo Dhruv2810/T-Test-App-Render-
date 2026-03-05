@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, send_from_directory
 import numpy as np
 from scipy import stats
 
@@ -10,17 +10,17 @@ def one_sample_t_test(data, pop_mean, hypothesis):
 
 @app.route("/")
 def home():
-    return "T-Test API Running"
+    return send_from_directory(".", "app.html")
 
 @app.route("/ttest", methods=["POST"])
 def ttest():
     data = request.json["data"]
     mean = float(request.json["mean"])
     hypothesis = request.json["hypothesis"]
-
     result = one_sample_t_test(data, mean, hypothesis)
-
     return jsonify(result)
 
 if __name__ == "__main__":
-    app.run()
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
